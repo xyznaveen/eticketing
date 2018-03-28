@@ -1,1 +1,2 @@
-0 	=>	Email already exists
+6512 	=>	Email already exists.
+5511	=>	Couldn't connect to the database.

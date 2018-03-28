@@ -47,7 +47,7 @@ class UserController extends Controller
      * 
      * @return void
      */
-	public function createUser(Request $request) {
+	public function create(Request $request) {
 
 		$email = $request->input('email');
 		$password = $request->input('password');
@@ -77,22 +77,27 @@ class UserController extends Controller
 
 		} catch(\Illuminate\Database\QueryException $e) {
 
-			// Failure, Exception raised
 			$errorCode = $e->errorInfo[1];
 			if($errorCode == '1062') { // Duplicate unique field, Possible [ email , phone numbder ]
 				return response()->json([
-					'task'			=>	'create new user',
-					'message'		=> 'fail',
-					'error-code'	=>	0,
-					'error'			=> [
-										'severity'	=> 	'critical',
-										'host'		=> 	'mysql',
-										'code'		=>	$e->errorInfo[1],
-										'message'	=> 	$e->errorInfo[2],
-									],
-					'summary'		=> 'Email already exists in our database.',
+					'errors'	=>	[
+						'status'	=>	6512,
+						'title'		=>	'Duplicate Email',
+						'detail'	=>	'Email is already registered. Please try logging in or try resetting password.',					
+					],
 				]);
 			}
+
+			// If exception is thrown but doesn't match any of the listed SQL exceptions then
+			// there is problem in database connection. Check lumen log for more details.
+			return response()->json([
+				'errors'	=>	[
+					'status'	=>	5511,
+					'title'	=>	'SQL Timeout',
+					'summary'	=> 	'Connection to database could not be made.',
+				],
+			]);
+
 		}
 	}
 

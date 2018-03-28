@@ -11,17 +11,24 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
-});
+$router->group([
+	'prefix'	=>	'v1'
+	], function() use ($router) {
 
-$router->post('/test', 'UserController@authentication');
-$router->post('/signup', 'UserController@createUser');
+		// You'll get this
+		$router->get('/', function () use ($router) {return response(['message'	=>	'api server','built-on'	=> 'Lumen ( mini Laravel )','api-version'	=> 0.1,]);});
 
-$router->group(['middleware' => 	'auth', 'prefix' 	=> 	'api'], function () use ($router) {
-	
-	$router->post('/test', 'UserController@authentication');
+		$router->post('/signup', 'UserController@create');
+		$router->post('/login', 'AuthenticationController@login');
 
-	$router->get('/gen', 'ExampleController@gen');
+		// Requires authentication
+		$router->group([
+			'middleware' => 	'auth', 
+			'prefix' 	=> 	'api'
+			], function () use ($router) {
+				
+				$router->post('/test', 'UserController@authentication');
+				$router->get('/gen', 'ExampleController@gen');
 
+		});
 });
